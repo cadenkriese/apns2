@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/sideshow/apns2/token"
@@ -169,6 +170,10 @@ func (c *Client) PushWithContext(ctx Context, n *Notification) (*Response, error
 	}
 
 	url := c.Host + "/3/device/" + n.DeviceToken
+	if n.ChannelID != "" {
+		bundleID := strings.TrimSuffix(n.Topic, ".push-type.liveactivity")
+		url = c.Host + "/4/broadcasts/apps/" + bundleID
+	}
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(payload))
 	if err != nil {
 		return nil, err
@@ -231,5 +236,8 @@ func setHeaders(r *http.Request, n *Notification) {
 		r.Header.Set("apns-push-type", string(n.PushType))
 	} else {
 		r.Header.Set("apns-push-type", string(PushTypeAlert))
+	}
+	if n.ChannelID != "" {
+		r.Header.Set("apns-channel-id", n.ChannelID)
 	}
 }

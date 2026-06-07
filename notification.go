@@ -147,6 +147,10 @@ type Notification struct {
 	// default an apns-push-type header with value 'alert' will be added to the
 	// http request.
 	PushType EPushType
+
+	// The channel for the notification to be broadcast on. Generally only used
+	// with broadcast live activities.
+	ChannelID string
 }
 
 // MarshalJSON converts the notification payload to JSON.
